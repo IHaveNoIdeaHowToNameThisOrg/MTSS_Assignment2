@@ -1,0 +1,1 @@
+[![Run checkstyle](https://github.com/IHaveNoIdeaHowToNameThisOrg/MTSS_Assignment2/actions/workflows/checkstyle.yml/badge.svg)](https://github.com/IHaveNoIdeaHowToNameThisOrg/MTSS_Assignment2/actions/workflows/checkstyle.yml)
