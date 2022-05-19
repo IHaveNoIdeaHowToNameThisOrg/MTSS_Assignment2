@@ -13,8 +13,12 @@
         <property name="max" value="120"/> <!-- it's 2022 and we have big monitors-->
     </module>
     <module name="TreeWalker">
-        <module name="BooleanExpressionComplexity"/>
-        <module name="CyclomaticComplexity"/>
+        <module name="BooleanExpressionComplexity">
+            <property name="max" value="10"/>
+        </module>
+        <module name="CyclomaticComplexity">
+            <property name="max" value="15"/>
+        </module>
         <module name="MethodLength"/>
         <module name="EmptyCatchBlock"/>
         <module name="AvoidStarImport"/>
