@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.params.DoubleRangeSource;
 import org.junitpioneer.jupiter.params.IntRangeSource;
 
 import java.util.Arrays;
@@ -68,7 +69,7 @@ public class BillImplTest {
     @ParameterizedTest
     @IntRangeSource(from = 11, to = 15)
     void testTenMousesGiftApplying(int mousesCount) {
-        var items = generateItems(ItemType.MOUSE, mousesCount, 10).toList();
+        var items = generateItems(ItemType.MOUSE, mousesCount, 5).toList();
         var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
                 - items.stream().mapToDouble(EItem::price).min().orElseThrow();
         assertEquals(expectedTotal, bill.getOrderPrice(items, user));
@@ -183,4 +184,18 @@ public class BillImplTest {
                 .mapToDouble(EItem::price).min().orElseThrow();
         assertEquals(expectedTotal, bill.getOrderPrice(items, user));
     }
+    @DisplayName("order total <= 1000 doesn't get discounted")
+    @ParameterizedTest
+    @DoubleRangeSource(from=100, to=1001, step = 100)
+    void testNoTotalDiscount(double itemPrice) {
+        assertEquals(itemPrice, bill.getOrderPrice(List.of(new EItem(ItemType.KEYBOARD, "foo", itemPrice)), user));
+    }
+
+    @DisplayName("order total > 1000 gets discounted")
+    @ParameterizedTest
+    @DoubleRangeSource(from=1001, to=2000, step=100)
+    void testTotalDiscount(double itemPrice) {
+        assertEquals(itemPrice * 0.9, bill.getOrderPrice(List.of(new EItem(ItemType.KEYBOARD, "foo", itemPrice)), user));
+    }
+
 }

@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 public class BillImpl implements Bill{
 
     private static final int MIN_PROCESSORS_FOR_DISCOUNT = 5;
+    private static final double MIN_TOTAL_DISCOUNT = 1000;
+    private static final double TOTAL_DISCOUNT_AMOUNT = 0.1;
 
     private static final int MIN_MOUSES_FOR_DISCOUNT = 10;
 
@@ -55,6 +57,9 @@ public class BillImpl implements Bill{
                     .toArray();
             // gift second pick if a mouse was gifted and it is the first pick
             orderTotal -= giftPicks[giftedMouse.isPresent() && giftPicks[0] == giftedMouse.getAsDouble() ? 1 : 0];
+        }
+        if (orderTotal > MIN_TOTAL_DISCOUNT) {
+            orderTotal *= 1 - TOTAL_DISCOUNT_AMOUNT;
         }
         return orderTotal;
     }
