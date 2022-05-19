@@ -2,16 +2,10 @@
 // Augusto Zanellato 2000555
 // Stefano Zanovello 2008459
 ////////////////////////////////////////////////////////////////////
-package it.unipd.mtss;
+package it.unipd.mtss.model.exception;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+public class BillException extends EException {
+    public BillException(String message) {
+        super(message);
     }
 }
