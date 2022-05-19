@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.params.IntRangeSource;
 
@@ -108,4 +109,78 @@ public class BillImplTest {
         assertEquals(expectedTotal, bill.getOrderPrice(items, user));
     }
 
+    @DisplayName("mouse/keyboard combo gift is not applied with different number of m/k")
+    @ParameterizedTest
+    @CsvSource(value = {
+            "1,2",
+            "2,3",
+            "3,2",
+            "2,1"
+    })
+    void testMKComboGiftNotApplying(int mousesCount, int keyboardsCount) {
+        var items = Stream.concat(generateItems(ItemType.MOUSE, mousesCount, 5),
+                generateItems(ItemType.KEYBOARD, keyboardsCount, 10)).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+    @DisplayName("mouse/keyboard combo gift is applied with same number of m/k and no mouse gift")
+    @ParameterizedTest
+    @IntRangeSource(from = 1, to = 11)
+    void testMKComboGiftApplyingWithoutMouseGift(int count) {
+        final var mousePriceMultiplier = 5;
+        final var keyboardPriceMultiplier = 10;
+        var items = Stream.of(generateItems(ItemType.MOUSE, count, mousePriceMultiplier),
+                generateItems(ItemType.KEYBOARD, count, keyboardPriceMultiplier),
+                generateItems(ItemType.PROCESSOR, 2, 15)).flatMap(s -> s).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
+                - items.stream().mapToDouble(EItem::price).min().orElseThrow();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+    @DisplayName("mouse/keyboard combo gift applied with mouse gift, gifting 2 mouses")
+    @ParameterizedTest
+    @IntRangeSource(from = 11, to = 15)
+    void testMKComboGiftApplyingWithDoubleMouseGift(int count) {
+        final var mousePriceMultiplier = 2;
+        final var keyboardPriceMultiplier = 5;
+        var items = Stream.concat(generateItems(ItemType.MOUSE, count, mousePriceMultiplier),
+                generateItems(ItemType.KEYBOARD, count, keyboardPriceMultiplier)).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
+                - generateItems(ItemType.MOUSE, count, mousePriceMultiplier)
+                .mapToDouble(EItem::price).sorted().limit(2).sum();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+    @DisplayName("mouse/keyboard combo gift applied with mouse gift, gifting a mouse < keyboard")
+    @ParameterizedTest
+    @IntRangeSource(from = 11, to = 15)
+    void testMKComboGiftApplyingWithMouseAndKeyboardGiftCheaperMouse(int count) {
+        final var mousePriceMultiplier = 3;
+        final var keyboardPriceMultiplier = 5;
+        var items = Stream.concat(generateItems(ItemType.MOUSE, count, mousePriceMultiplier),
+                generateItems(ItemType.KEYBOARD, count, keyboardPriceMultiplier)).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
+                - generateItems(ItemType.MOUSE, count, mousePriceMultiplier)
+                .mapToDouble(EItem::price).min().orElseThrow()
+                - generateItems(ItemType.KEYBOARD, count, keyboardPriceMultiplier)
+                .mapToDouble(EItem::price).min().orElseThrow();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+    @DisplayName("mouse/keyboard combo gift applied with mouse gift, gifting a mouse > keyboard")
+    @ParameterizedTest
+    @IntRangeSource(from = 11, to = 15)
+    void testMKComboGiftApplyingWithMouseAndKeyboardGiftCheaperKeyboard(int count) {
+        final var mousePriceMultiplier = 5;
+        final var keyboardPriceMultiplier = 3;
+        var items = Stream.concat(generateItems(ItemType.MOUSE, count, mousePriceMultiplier),
+                generateItems(ItemType.KEYBOARD, count, keyboardPriceMultiplier)).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
+                - generateItems(ItemType.MOUSE, count, mousePriceMultiplier)
+                .mapToDouble(EItem::price).min().orElseThrow()
+                - generateItems(ItemType.KEYBOARD, count, keyboardPriceMultiplier)
+                .mapToDouble(EItem::price).min().orElseThrow();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
 }

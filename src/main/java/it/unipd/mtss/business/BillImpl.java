@@ -17,6 +17,8 @@ public class BillImpl implements Bill{
 
     private static final int MIN_PROCESSORS_FOR_DISCOUNT = 5;
 
+    private static final int MIN_MOUSES_FOR_DISCOUNT = 10;
+
     private static Stream<EItem> filteredItems(List<EItem> itemsOrdered, ItemType type) {
         return itemsOrdered.stream().filter(item -> item.itemType() == type);
     }
@@ -34,12 +36,25 @@ public class BillImpl implements Bill{
                     .mapToDouble(EItem::price)
                     .min().orElseThrow() / 2;
         }
+
+        OptionalDouble giftedMouse = OptionalDouble.empty();
         final var mouseCount = filteredItems(itemsOrdered, ItemType.MOUSE).count();
-        if (mouseCount > 10) {
+        if (mouseCount > MIN_MOUSES_FOR_DISCOUNT) {
             // this can't throw because we already checked that there are more than 10 mouses.
-            orderTotal -= filteredItems(itemsOrdered, ItemType.MOUSE)
+            giftedMouse = OptionalDouble.of(filteredItems(itemsOrdered, ItemType.MOUSE)
                     .mapToDouble(EItem::price)
-                    .min().orElseThrow();
+                    .min().orElseThrow());
+            orderTotal -= giftedMouse.getAsDouble();
+        }
+        if (mouseCount != 0 && mouseCount == filteredItems(itemsOrdered, ItemType.KEYBOARD).count()) {
+            var giftPicks = itemsOrdered.stream()
+                    .filter(item -> item.itemType() == ItemType.MOUSE || item.itemType() == ItemType.KEYBOARD)
+                    .mapToDouble(EItem::price)
+                    .sorted()
+                    .limit(2)
+                    .toArray();
+            // gift second pick if a mouse was gifted and it is the first pick
+            orderTotal -= giftPicks[giftedMouse.isPresent() && giftPicks[0] == giftedMouse.getAsDouble() ? 1 : 0];
         }
         return orderTotal;
     }
