@@ -1,1 +1,2 @@
 [![Run checkstyle](https://github.com/IHaveNoIdeaHowToNameThisOrg/MTSS_Assignment2/actions/workflows/checkstyle.yml/badge.svg)](https://github.com/IHaveNoIdeaHowToNameThisOrg/MTSS_Assignment2/actions/workflows/checkstyle.yml)
+[![JavaCI_ubuntu_JDK17](https://github.com/IHaveNoIdeaHowToNameThisOrg/MTSS_Assignment2/actions/workflows/maven_ubuntu_jdk17.yml/badge.svg)](https://github.com/IHaveNoIdeaHowToNameThisOrg/MTSS_Assignment2/actions/workflows/maven_ubuntu_jdk17.yml)
