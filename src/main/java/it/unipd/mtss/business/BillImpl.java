@@ -14,6 +14,11 @@ public class BillImpl implements Bill{
 
     @Override
     public double getOrderPrice(List<EItem> itemsOrdered, User user) throws BillException {
+        if(itemsOrdered.isEmpty()){
+            throw new BillException("Order can't be empty");
+        }
         return itemsOrdered.stream().mapToDouble(EItem::price).sum();
     }
+
+
 }
