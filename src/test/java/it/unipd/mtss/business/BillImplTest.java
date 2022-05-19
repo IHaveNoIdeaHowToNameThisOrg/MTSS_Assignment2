@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.params.IntRangeSource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +61,31 @@ public class BillImplTest {
                 Arguments.of(60, Arrays.asList(6, 12, 24, 8, 5, 3, 2)),
                 Arguments.of(110, Arrays.asList(6, 4, 19, 11, 8, 12, 3, 7, 16, 17, 7))
         );
+    }
+
+    private static Stream<EItem> generateItems(ItemType type, int quantity, int priceMultiplier) {
+        return IntStream.range(0, quantity)
+                .map(v -> (v + 1) * priceMultiplier)
+                .mapToObj(price -> new EItem(type, "foo", price));
+    }
+
+    @DisplayName(">5 processors discount is not applied with less than 6 processors")
+    @ParameterizedTest
+    @IntRangeSource(from = 1, to = 6)
+    void testFiveProcessorsDiscountNotApplying(int processorCount) {
+        var items = generateItems(ItemType.PROCESSOR, processorCount, 10).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+    @DisplayName(">5 processors discount is applied with at least 6 processors")
+    @ParameterizedTest
+    @IntRangeSource(from = 6, to = 15)
+    void testFiveProcessorsDiscountApplying(int processorCount) {
+        var items = generateItems(ItemType.PROCESSOR, processorCount, 5).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
+                - (items.stream().mapToDouble(EItem::price).min().orElseThrow() / 2);
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
     }
 
 }
