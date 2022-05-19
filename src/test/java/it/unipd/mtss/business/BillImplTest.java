@@ -198,4 +198,20 @@ public class BillImplTest {
         assertEquals(itemPrice * 0.9, bill.getOrderPrice(List.of(new EItem(ItemType.KEYBOARD, "foo", itemPrice)), user));
     }
 
+    @DisplayName("order with <= 30 item gets accepted")
+    @ParameterizedTest
+    @IntRangeSource(from = 1, to = 30)
+    void testItemLimitAccepted(int itemCount) {
+        bill.getOrderPrice(generateItems(ItemType.KEYBOARD, itemCount, 1).toList(), user);
+    }
+
+    @DisplayName("order with <= 30 item gets rejected")
+    @ParameterizedTest
+    @IntRangeSource(from = 31, to = 40)
+    void testItemLimitRejected(int itemCount) {
+        assertThrows(BillException.class,
+                () -> bill.getOrderPrice(generateItems(ItemType.KEYBOARD, itemCount, 1).toList(), user)
+        );
+    }
+
 }

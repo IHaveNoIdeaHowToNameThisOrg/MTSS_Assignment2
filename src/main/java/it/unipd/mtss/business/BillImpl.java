@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 public class BillImpl implements Bill{
 
+    private static final int MAX_ITEM_COUNT = 30;
     private static final int MIN_PROCESSORS_FOR_DISCOUNT = 5;
     private static final double MIN_TOTAL_DISCOUNT = 1000;
     private static final double TOTAL_DISCOUNT_AMOUNT = 0.1;
@@ -30,6 +31,11 @@ public class BillImpl implements Bill{
         if(itemsOrdered.isEmpty()){
             throw new BillException("Order can't be empty");
         }
+
+        if (itemsOrdered.size() > MAX_ITEM_COUNT) {
+            throw new BillException("Order can't contain more than " + MAX_ITEM_COUNT + " elements");
+        }
+
         var orderTotal = itemsOrdered.stream().mapToDouble(EItem::price).sum();
 
         if (filteredItems(itemsOrdered, ItemType.PROCESSOR).count() > MIN_PROCESSORS_FOR_DISCOUNT) {
