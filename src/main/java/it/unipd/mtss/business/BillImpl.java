@@ -10,6 +10,7 @@ import it.unipd.mtss.model.User;
 import it.unipd.mtss.model.exception.BillException;
 
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Stream;
 
 public class BillImpl implements Bill{
@@ -32,6 +33,13 @@ public class BillImpl implements Bill{
             orderTotal -= filteredItems(itemsOrdered, ItemType.PROCESSOR)
                     .mapToDouble(EItem::price)
                     .min().orElseThrow() / 2;
+        }
+        final var mouseCount = filteredItems(itemsOrdered, ItemType.MOUSE).count();
+        if (mouseCount > 10) {
+            // this can't throw because we already checked that there are more than 10 mouses.
+            orderTotal -= filteredItems(itemsOrdered, ItemType.MOUSE)
+                    .mapToDouble(EItem::price)
+                    .min().orElseThrow();
         }
         return orderTotal;
     }

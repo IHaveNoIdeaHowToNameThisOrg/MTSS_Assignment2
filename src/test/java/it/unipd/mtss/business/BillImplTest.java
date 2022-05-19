@@ -54,6 +54,26 @@ public class BillImplTest {
         assertEquals(total, bill.getOrderPrice(items, user));
     }
 
+    @DisplayName(">10 mouses gift is not applied with less than 11 mouses")
+    @ParameterizedTest
+    @IntRangeSource(from = 1, to = 11)
+    void testTenMousesGiftNotApplying(int mousesCount) {
+        var items = generateItems(ItemType.MOUSE, mousesCount, 10).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+    @DisplayName(">10 mouses gift is applied with at least 11 mouses")
+    @ParameterizedTest
+    @IntRangeSource(from = 11, to = 15)
+    void testTenMousesGiftApplying(int mousesCount) {
+        var items = generateItems(ItemType.MOUSE, mousesCount, 10).toList();
+        var expectedTotal = items.stream().mapToDouble(EItem::price).sum()
+                - items.stream().mapToDouble(EItem::price).min().orElseThrow();
+        assertEquals(expectedTotal, bill.getOrderPrice(items, user));
+    }
+
+
     static Stream<Arguments> generateSimpleTotalData() {
         return Stream.of(
                 Arguments.of(10, Arrays.asList(6, 4)),
