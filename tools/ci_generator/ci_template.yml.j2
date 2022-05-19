@@ -1,0 +1,18 @@
+name: JavaCI_{{ os }}_JDK{{ jdk }}
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: '{{ os }}-latest'
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '{{ jdk }}'
+          distribution: 'adopt'
+          cache: 'maven'
+      - name: Build with Maven
+        run: mvn --batch-mode --update-snapshots package
