@@ -214,4 +214,18 @@ public class BillImplTest {
         );
     }
 
+    @DisplayName("order total >= 10 doesn't get commission added")
+    @ParameterizedTest
+    @IntRangeSource(from=10, to=100, step = 2)
+    void testNoCommissionOverTotal10(double itemPrice) {
+        assertEquals(itemPrice, bill.getOrderPrice(List.of(new EItem(ItemType.KEYBOARD, "foo", itemPrice)), user));
+    }
+
+    @DisplayName("order total < 10 gets commission added")
+    @ParameterizedTest
+    @IntRangeSource(from=1, to=10)
+    void testCommissionUnderTotal10(double itemPrice) {
+        assertEquals(itemPrice + 2, bill.getOrderPrice(List.of(new EItem(ItemType.KEYBOARD, "foo", itemPrice)), user));
+    }
+
 }

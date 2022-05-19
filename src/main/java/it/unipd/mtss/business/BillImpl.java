@@ -19,8 +19,9 @@ public class BillImpl implements Bill{
     private static final int MIN_PROCESSORS_FOR_DISCOUNT = 5;
     private static final double MIN_TOTAL_DISCOUNT = 1000;
     private static final double TOTAL_DISCOUNT_AMOUNT = 0.1;
-
     private static final int MIN_MOUSES_FOR_DISCOUNT = 10;
+    private static final double MIN_TOTAL_WITHOUT_COMMISSION = 10;
+    private static final double SMALL_ORDER_COMMISSION = 2;
 
     private static Stream<EItem> filteredItems(List<EItem> itemsOrdered, ItemType type) {
         return itemsOrdered.stream().filter(item -> item.itemType() == type);
@@ -66,6 +67,10 @@ public class BillImpl implements Bill{
         }
         if (orderTotal > MIN_TOTAL_DISCOUNT) {
             orderTotal *= 1 - TOTAL_DISCOUNT_AMOUNT;
+        }
+
+        if (orderTotal < MIN_TOTAL_WITHOUT_COMMISSION) {
+            orderTotal += SMALL_ORDER_COMMISSION;
         }
         return orderTotal;
     }
